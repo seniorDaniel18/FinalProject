@@ -22,28 +22,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(int id) {
-
+        
         User user1 = null;
 
         for (User user : userDao.getUsers()) {
             if (user.getId() == id) {
                 user1 = user;
-            } else {
-                throw new MyException("Такого id нет ಠಿ_ಠ)");
             }
         }
-        return user1;
+        if (user1 == null) {
+            throw new MyException("Такого id нет ಠಿ_ಠ)");
+        } else {
+            return user1;
+        }
     }
 
     @Override
     public void deleteById(int id) {
 
-        for (User user : userDao.getUsers()) {
-            if (user.getId() == id) {
-                userDao.getUsers().remove(user);
-            } else if (user.getId() != id){
-                throw new MyException("Такого id нет ಠಿ_ಠ)");
-            }
+          try {
+            User user = userDao.getUsers()
+                    .stream()
+                    .filter(u -> u.getId() == id)
+                    .findFirst()
+                    .orElseThrow(() -> new MyException("Такого id нет ಠಿ_ಠ)"));
+            userDao.getUsers().remove(user);
+        } catch (MyException e) {
+            System.out.println(e.getMessage());
         }
     }
 
